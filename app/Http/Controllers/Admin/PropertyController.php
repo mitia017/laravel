@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PropertyRequest;
-use App\Models\property;
+use App\Models\Property;
 use App\Models\Option;
 
 class PropertyController extends Controller
@@ -14,7 +14,7 @@ class PropertyController extends Controller
     public function index()
     {
         return view('admin.properties.index', [
-            'properties' => property::orderby('created_at', 'desc')->paginate(25)
+            'properties' => Property::orderby('created_at', 'desc')->paginate(25)
         ]);
     }
 
@@ -23,7 +23,7 @@ class PropertyController extends Controller
      */
     public function create()
     {
-        $property = new property();
+        $property = new Property();
         $property->fill([
             'surface' => 40,
             'rooms' => 3,
@@ -44,14 +44,14 @@ class PropertyController extends Controller
      */
     public function store(PropertyRequest $request)
     {
-        $property = property::create($request->validated());
+        $property = Property::create($request->validated());
         $property->options()->sync($request->validated('options'));
         return to_route('admin.property.index')->with('success', 'Le bien a bien été créé');
     }
     
     
 
-    public function edit(property $property)
+    public function edit(Property $property)
     {
         return view('admin.properties.form', [
             'property' => $property,
@@ -62,7 +62,7 @@ class PropertyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(PropertyRequest $request, property $property)
+    public function update(PropertyRequest $request, Property $property)
     {
         $property->options()->sync($request->validated('options'));
         $property->update($request->validated());
@@ -72,7 +72,7 @@ class PropertyController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(property $property)
+    public function destroy(Property $property)
     {
         $property->delete();
         return to_route('admin.property.index')->with('success', 'Le bien a bien été supprimé');

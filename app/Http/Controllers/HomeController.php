@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\property;
+use App\Models\Property;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
     public function index ()
     {
-        $properties = property::limit(4)->dispo()->recent()->get();
+        $properties = Property::limit(4)->dispo()->recent()->get();
         return view('home', [
             'properties' => $properties
         ]);

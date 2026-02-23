@@ -5,7 +5,7 @@ Une nouvelle demande de contact a été fait pour le bien <a href="{{ route('pro
 
 -Prénom: {{ $data['firstname'] }}<br/>
 -Nom: {{ $data['lastname'] }}<br/>
--Téléphpne: {{ $data['phone'] }}<br/>
+-Téléphone: {{ $data['phone'] }}<br/>
 -Email: {{ $data['email'] }}<br/>
 
 **Message :**</br>
