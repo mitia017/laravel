@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
-            $table->dateTime('deleted_at')->nullable();
+        Schema::create('property_images', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('property_id')->constrained()->onDelete('cascade');
+            $table->string('path');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('properties', function (Blueprint $table) {
-            $table->dropColumn('deleted_at');
-        });
+        Schema::dropIfExists('property_images');
     }
 };
