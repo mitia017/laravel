@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('property_images', function (Blueprint $table) {
+        Schema::create('invoices', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('property_id')->constrained()->onDelete('cascade');
-            $table->string('path');
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->string('invoice_number')->unique();
+            $table->decimal('total', 15, 2);
+            $table->string('status')->default('unpaid'); // unpaid, paid, cancelled
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('property_images');
+        Schema::dropIfExists('invoices');
     }
 };

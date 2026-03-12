@@ -3,67 +3,34 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Invoice;
-use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Http\Request;
+use App\Http\Requests\Invoice\UpdateInvoiceRequest;
+use App\Http\Resources\InvoiceResource;
+use App\Services\InvoiceService;
 
 class InvoiceController extends Controller
 {
+    protected $invoiceService;
+
+    public function __construct(InvoiceService $invoiceService)
+    {
+        $this->invoiceService = $invoiceService;
+    }
+
     public function index()
     {
-        return response()->json(Invoice::with('client')->latest()->get());
+        $invoices = $this->invoiceService->getAllInvoices();
+        return InvoiceResource::collection($invoices);
     }
 
-    public function store(Request $request)
+    public function show($id)
     {
-        $validated = $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'number' => 'required|string|unique:invoices,number',
-            'amount' => 'required|numeric|min:0',
-            'status' => 'required|in:pending,paid,cancelled',
-            'date' => 'required|date',
-            'due_date' => 'nullable|date|after_or_equal:date',
-        ]);
-
-        $invoice = Invoice::create($validated);
-
-        return response()->json($invoice->load('client'), 201);
+        $invoice = $this->invoiceService->getInvoiceById($id);
+        return new InvoiceResource($invoice);
     }
 
-    public function show(Invoice $invoice)
+    public function update(UpdateInvoiceRequest $request, $id)
     {
-        return response()->json($invoice->load('client'));
-    }
-
-    public function update(Request $request, Invoice $invoice)
-    {
-        $validated = $request->validate([
-            'client_id' => 'required|exists:clients,id',
-            'number' => 'required|string|unique:invoices,number,' . $invoice->id,
-            'amount' => 'required|numeric|min:0',
-            'status' => 'required|in:pending,paid,cancelled',
-            'date' => 'required|date',
-            'due_date' => 'nullable|date|after_or_equal:date',
-        ]);
-
-        $invoice->update($validated);
-
-        return response()->json($invoice->load('client'));
-    }
-
-    public function destroy(Invoice $invoice)
-    {
-        $invoice->delete();
-
-        return response()->json(null, 204);
-    }
-
-    public function downloadPdf(Invoice $invoice)
-    {
-        $invoice->load('client');
-
-        $pdf = Pdf::loadView('pdf.invoice', ['invoice' => $invoice]);
-
-        return $pdf->download("invoice_{$invoice->number}.pdf");
+        $invoice = $this->invoiceService->updateInvoiceStatus($id, $request->validated()['status']);
+        return new InvoiceResource($invoice);
     }
 }
