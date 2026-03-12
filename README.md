@@ -1,59 +1,94 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Laravel ERP MVP API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This is a complete MVP ERP backend built with Laravel 11. It is an API-only project following clean architecture with Service layer, Form Requests, and API Resources.
 
-## About Laravel
+## Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Authentication**: Laravel Sanctum (Login, Logout, Me).
+- **Users**: CRUD users (admin/staff roles).
+- **Customers**: CRUD customers.
+- **Products**: CRUD products with stock management.
+- **Orders**: Create orders, automatically update stock, and generate invoices.
+- **Invoices**: Automatically generated from orders.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Tech Stack
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- Laravel 11
+- Laravel Sanctum (Auth)
+- SQLite (Default database)
 
-## Learning Laravel
+## Setup Instructions
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+1. **Clone the repository**
+2. **Install dependencies**
+   ```bash
+   composer install
+   ```
+3. **Configure environment**
+   ```bash
+   cp .env.example .env
+   php artisan key:generate
+   ```
+4. **Database setup**
+   ```bash
+   touch database/database.sqlite
+   php artisan migrate:fresh --seed
+   ```
+   *The seeder creates:*
+   - Admin: `admin@example.com` / `password`
+   - Staff: `staff@example.com` / `password`
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+5. **Run tests**
+   ```bash
+   php artisan test
+   ```
 
-## Laravel Sponsors
+## API Documentation
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+All endpoints (except `/api/login`) require `Authorization: Bearer <token>`.
 
-### Premium Partners
+### Authentication
+- `POST /api/login`: Get access token.
+- `POST /api/logout`: Revoke access token.
+- `GET /api/me`: Get current user info.
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Users
+- `GET /api/users`: List users (Paginated).
+- `POST /api/users`: Create user.
+- `GET /api/users/{id}`: View user.
+- `PUT /api/users/{id}`: Update user.
+- `DELETE /api/users/{id}`: Delete user.
 
-## Contributing
+### Customers
+- `GET /api/customers`: List customers.
+- `POST /api/customers`: Create customer.
+- `GET /api/customers/{id}`: View customer.
+- `PUT /api/customers/{id}`: Update customer.
+- `DELETE /api/customers/{id}`: Delete customer.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Products
+- `GET /api/products`: List products.
+- `POST /api/products`: Create product.
+- `GET /api/products/{id}`: View product.
+- `PUT /api/products/{id}`: Update product.
+- `DELETE /api/products/{id}`: Delete product.
 
-## Code of Conduct
+### Orders
+- `GET /api/orders`: List orders.
+- `POST /api/orders`: Create order (Reduces stock, generates invoice).
+- `GET /api/orders/{id}`: View order with items and invoice.
+- `PUT /api/orders/{id}`: Update order status.
+- `DELETE /api/orders/{id}`: Delete order (Restores stock).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Invoices
+- `GET /api/invoices`: List invoices.
+- `GET /api/invoices/{id}`: View invoice.
+- `PUT /api/invoices/{id}`: Update invoice status.
 
-## Security Vulnerabilities
+## Clean Architecture
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **Models**: Standard Eloquent models with relationships.
+- **Services**: Business logic isolated from controllers (`app/Services`).
+- **Requests**: Validation logic (`app/Http/Requests`).
+- **Resources**: API response formatting (`app/Http/Resources`).
+- **Factories/Seeders**: Demo data generation.
